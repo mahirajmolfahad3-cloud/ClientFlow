@@ -4,9 +4,14 @@ import { supabase } from '@/lib/supabase'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { taskSchema, type TaskFormData } from '@/lib/validations'
-import type { Task, Project } from '@/types'
+import type { Task } from '@/types'
 import { Button, Input, Textarea, Select, Modal, PageLoader, ConfirmDialog, PriorityBadge } from '@/components/ui'
 import { Plus, Pencil, Trash2, Calendar, ChevronRight } from 'lucide-react'
+
+type ProjectOption = {
+  id: string
+  name: string
+}
 
 const COLUMNS: { key: Task['status']; label: string; color: string; dot: string }[] = [
   { key: 'todo', label: 'To Do', color: 'bg-gray-50 border-gray-200', dot: 'bg-gray-400' },
@@ -27,7 +32,7 @@ const PRIORITY_OPTIONS = [
 
 function TaskForm({ initial, projects, onSave, onCancel, loading }: {
   initial?: Partial<Task>
-  projects: Project[]
+  projects: ProjectOption[]
   onSave: (data: TaskFormData) => void
   onCancel: () => void
   loading: boolean
@@ -114,7 +119,7 @@ function TaskCard({ task, onEdit, onDelete, onMove }: {
 
 export default function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([])
-  const [projects, setProjects] = useState<Project[]>([])
+  const [projects, setProjects] = useState<ProjectOption[]>([])
   const [loading, setLoading] = useState(true)
   const [showAdd, setShowAdd] = useState(false)
   const [defaultStatus, setDefaultStatus] = useState<Task['status']>('todo')
@@ -134,41 +139,87 @@ export default function TasksPage() {
 
   useEffect(() => { load() }, [])
 
+  
+
   async function handleAdd(data: TaskFormData) {
     setSaving(true)
-    const { data: { session } } = await supabase.auth.getSession()
-    await supabase.from('tasks').insert({
-      ...data,
-      user_id: session!.user.id,
-      project_id: data.project_id || null,
-      due_date: data.due_date || null,
-    })
-    await load()
-    setShowAdd(false)
-    setSaving(false)
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+
+      if (!session) return
+
+      const { error } = await supabase.from('tasks').insert({
+        ...data,
+        user_id: session.user.id,
+        project_id: data.project_id || null,
+        due_date: data.due_date || null,
+      })
+
+      if (error) {
+        console.error(error)
+        return
+      }
+
+      await load()
+      setShowAdd(false)
+    } finally {
+      setSaving(false)
+    }
   }
 
   async function handleEdit(data: TaskFormData) {
     if (!editing) return
+
     setSaving(true)
-    await supabase.from('tasks').update({
-      ...data,
-      project_id: data.project_id || null,
-      due_date: data.due_date || null,
-    }).eq('id', editing.id)
-    await load()
-    setEditing(null)
-    setSaving(false)
+
+    try {
+      const { error } = await supabase
+        .from('tasks')
+        .update({
+          ...data,
+          project_id: data.project_id || null,
+          due_date: data.due_date || null,
+        })
+        .eq('id', editing.id)
+
+      if (error) {
+        console.error(error)
+        return
+      }
+
+      await load()
+      setEditing(null)
+    } finally {
+      setSaving(false)
+    }
   }
 
   async function handleDelete() {
     if (!deleting) return
+
     setSaving(true)
-    await supabase.from('tasks').delete().eq('id', deleting.id)
-    await load()
-    setDeleting(null)
-    setSaving(false)
+
+    try {
+      const { error } = await supabase
+        .from('tasks')
+        .delete()
+        .eq('id', deleting.id)
+
+      if (error) {
+        console.error(error)
+        return
+      }
+
+      await load()
+      setDeleting(null)
+    } finally {
+      setSaving(false)
+    }
   }
+
+
+
 
   async function handleMove(task: Task, status: Task['status']) {
     await supabase.from('tasks').update({ status }).eq('id', task.id)
@@ -246,7 +297,7 @@ export default function TasksPage() {
       <Modal open={showAdd} onClose={() => setShowAdd(false)} title="New task">
         <TaskForm
           initial={{ status: defaultStatus }}
-          projects={projects as Project[]}
+          projects={projects}
           onSave={handleAdd}
           onCancel={() => setShowAdd(false)}
           loading={saving}
@@ -254,7 +305,7 @@ export default function TasksPage() {
       </Modal>
       <Modal open={!!editing} onClose={() => setEditing(null)} title="Edit task">
         {editing && (
-          <TaskForm initial={editing} projects={projects as Project[]} onSave={handleEdit} onCancel={() => setEditing(null)} loading={saving} />
+          <TaskForm initial={editing} projects={projects} onSave={handleEdit} onCancel={() => setEditing(null)} loading={saving} />
         )}
       </Modal>
       <ConfirmDialog open={!!deleting} onClose={() => setDeleting(null)} onConfirm={handleDelete}
