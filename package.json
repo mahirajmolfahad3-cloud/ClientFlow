@@ -10,11 +10,13 @@
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
     "@supabase/supabase-js": "^2.108.2",
+    "clsx": "^2.1.1",
     "lucide-react": "^0.383.0",
     "next": "^16.2.9",
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.51.5",
+    "tailwind-merge": "^3.6.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {

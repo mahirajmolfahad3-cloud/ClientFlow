@@ -49,8 +49,8 @@ export default function SignupPage() {
             &ldquo;ClientFlow helped me go from chaotic spreadsheets to a professional client operation in one afternoon.&rdquo;
           </blockquote>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white font-bold">SC</div>
-            <div><p className="text-white font-semibold">Sarah Chen</p><p className="text-indigo-200 text-sm">Freelance UX Designer</p></div>
+            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white font-bold">MF</div>
+            <div><p className="text-white font-semibold">Mahir</p><p className="text-indigo-200 text-sm">Freelance UX Designer</p></div>
           </div>
         </div>
         <div className="flex gap-6 text-indigo-200 text-sm">
@@ -75,12 +75,12 @@ export default function SignupPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Full name</label>
-              <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Jane Smith" required disabled={loading}
+              <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Your Name" required disabled={loading}
                 className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:opacity-50" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Email address</label>
-              <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required disabled={loading}
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="example@gmail.com" required disabled={loading}
                 className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:opacity-50" />
             </div>
             <div>
@@ -97,7 +97,7 @@ export default function SignupPage() {
 
           <p className="text-center text-sm text-gray-500">
             Already have an account?{' '}
-            <Link href="/auth/login" className="text-indigo-600 font-semibold hover:underline">Sign in</Link>
+            <Link href="/login" className="text-indigo-600 font-semibold hover:underline">Sign in</Link>
           </p>
         </div>
       </div>
