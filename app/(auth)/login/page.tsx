@@ -13,71 +13,168 @@ export default function LoginPage() {
     e.preventDefault()
     setError('')
     setLoading(true)
-    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+
+    const { error: signInError } =
+      await supabase.auth.signInWithPassword({ email, password })
+
     if (signInError) {
       setError(signInError.message)
       setLoading(false)
       return
     }
-    window.location.href = '/dashboard'
+
+    const { data } = await supabase.auth.getSession()
+
+    if (data.session) {
+      window.location.href = '/dashboard'
+    }
   }
 
   return (
-    <div className="min-h-screen flex bg-gray-50">
-      <div className="hidden lg:flex lg:w-1/2 bg-indigo-600 flex-col justify-between p-12">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center"><span className="text-white font-bold text-sm">CF</span></div>
-          <span className="text-white text-xl font-bold">ClientFlow</span>
+    <div className="min-h-screen flex bg-gradient-to-br from-slate-50 via-indigo-50 to-white">
+
+      {/* LEFT PANEL */}
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-indigo-700 via-violet-700 to-slate-900 p-12 flex-col justify-between">
+
+        {/* glow effects */}
+        <div className="absolute -top-24 -left-24 w-96 h-96 bg-indigo-400/20 blur-3xl rounded-full"></div>
+        <div className="absolute bottom-0 right-0 w-[28rem] h-[28rem] bg-violet-400/10 blur-3xl rounded-full"></div>
+
+        {/* logo */}
+        <Link href="/" className="flex items-center gap-2 relative z-10 group">
+          <div className="w-9 h-9 bg-white/15 backdrop-blur rounded-xl flex items-center justify-center
+                          group-hover:scale-105 transition">
+            <span className="text-white font-bold text-sm">CF</span>
+          </div>
+          <span className="text-white text-xl font-bold tracking-tight">
+            ClientFlow
+          </span>
+        </Link>
+
+        {/* content */}
+        <div className="space-y-6 relative z-10">
+          <h2 className="text-white text-4xl font-bold leading-tight tracking-tight">
+            Welcome back to your client hub
+          </h2>
+          <p className="text-indigo-100 text-lg leading-relaxed">
+            Everything you need to run your freelance business, organized and ready when you are.
+          </p>
         </div>
-        <div className="space-y-6">
-          <h2 className="text-white text-3xl font-bold leading-tight">Welcome back to your client hub</h2>
-          <p className="text-indigo-200 text-lg">Everything you need to run your freelance business, right where you left it.</p>
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          {[['500+', 'Freelancers'],['12k+', 'Projects tracked'],['98%', 'Satisfaction'],['4.9★', 'Average rating']].map(([n, l]) => (
-            <div key={l} className="bg-white/10 rounded-xl p-4">
+
+        {/* stats */}
+        <div className="grid grid-cols-2 gap-4 relative z-10">
+          {[
+            ['100+', 'Freelancers'],
+            ['5k+', 'Projects tracked'],
+            ['98.9%', 'Satisfaction'],
+            ['5★', 'Average rating']
+          ].map(([n, l]) => (
+            <div
+              key={l}
+              className="bg-white/10 border border-white/10 backdrop-blur rounded-2xl p-4
+                         hover:bg-white/15 transition"
+            >
               <p className="text-white text-xl font-bold">{n}</p>
-              <p className="text-indigo-200 text-sm">{l}</p>
+              <p className="text-indigo-100 text-sm">{l}</p>
             </div>
           ))}
         </div>
       </div>
 
+      {/* RIGHT PANEL */}
       <div className="flex-1 flex items-center justify-center p-6">
-        <div className="w-full max-w-sm space-y-8">
-          <div className="lg:hidden flex items-center gap-2 mb-4">
-            <div className="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center"><span className="text-white font-bold text-xs">CF</span></div>
-            <span className="text-gray-900 text-lg font-bold">ClientFlow</span>
-          </div>
-          <div>
-            <h1 className="text-2xl font-extrabold text-gray-900">Sign in to ClientFlow</h1>
-            <p className="text-gray-500 mt-1 text-sm">Enter your details to access your dashboard</p>
-          </div>
 
-          {error && <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3">{error}</div>}
+        <div className="w-full max-w-md">
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email address</label>
-              <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required disabled={loading}
-                className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:opacity-50" />
+          {/* CARD */}
+          <div className="bg-white/80 backdrop-blur-xl border border-gray-100
+                          shadow-xl rounded-3xl p-8 space-y-7
+                          hover:shadow-2xl hover:-translate-y-1 transition-all duration-500">
+
+            {/* header */}
+            <div className="space-y-1">
+              <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+                Sign in
+              </h1>
+              <p className="text-gray-500 text-sm">
+                Welcome back to ClientFlow
+              </p>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-              <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required disabled={loading}
-                className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:opacity-50" />
-            </div>
-            <button type="submit" disabled={loading}
-              className="w-full bg-indigo-600 text-white rounded-xl py-3 text-sm font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-60 flex items-center justify-center gap-2">
-              {loading && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
-              {loading ? 'Signing in…' : 'Sign in'}
-            </button>
-          </form>
 
-          <p className="text-center text-sm text-gray-500">
-            Don&apos;t have an account?{' '}
-            <Link href="/signup" className="text-indigo-600 font-semibold hover:underline">Sign up free</Link>
-          </p>
+            {/* error */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-2xl px-4 py-3 animate-pulse">
+                {error}
+              </div>
+            )}
+
+            {/* form */}
+            <form onSubmit={handleSubmit} className="space-y-4">
+
+              {/* email */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email address
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="example@gmail.com"
+                  required
+                  disabled={loading}
+                  className="w-full border border-gray-200 bg-white rounded-2xl px-4 py-3 text-sm
+                             focus:outline-none focus:ring-4 focus:ring-indigo-100
+                             focus:border-indigo-500 transition"
+                />
+              </div>
+
+              {/* password */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  placeholder="••••••••••"
+                  required
+                  disabled={loading}
+                  className="w-full border border-gray-200 bg-white rounded-2xl px-4 py-3 text-sm
+                             focus:outline-none focus:ring-4 focus:ring-indigo-100
+                             focus:border-indigo-500 transition"
+                />
+              </div>
+
+              {/* button */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-indigo-600 via-violet-600 to-indigo-700
+                           text-white rounded-2xl py-3 text-sm font-semibold
+                           hover:from-indigo-700 hover:via-violet-700 hover:to-indigo-800
+                           active:scale-[0.98] transition-all duration-200
+                           disabled:opacity-60 flex items-center justify-center gap-2 shadow-md"
+              >
+                {loading && (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                )}
+                {loading ? 'Signing in…' : 'Sign in'}
+              </button>
+            </form>
+
+            {/* footer */}
+            <p className="text-center text-sm text-gray-500">
+              Don&apos;t have an account?{' '}
+              <Link
+                href="/signup"
+                className="text-indigo-600 font-semibold hover:text-indigo-700 hover:underline transition"
+              >
+                Sign up free
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>

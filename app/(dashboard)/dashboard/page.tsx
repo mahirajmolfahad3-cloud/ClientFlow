@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase'
 import { Users, FolderOpen, CheckSquare, Clock, TrendingUp, AlertCircle } from 'lucide-react'
 import { PageLoader, ProjectStatusBadge, PriorityBadge } from '@/components/ui'
 import type { Client, Project, Task } from '@/types'
+import { useRouter } from 'next/navigation'
 
 export default function DashboardPage() {
   const [clients, setClients] = useState<Client[]>([])
@@ -12,6 +13,21 @@ export default function DashboardPage() {
   const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(true)
   const [userName, setUserName] = useState('')
+
+
+  const router = useRouter()
+
+  useEffect(() => {
+    const check = async () => {
+      const { data } = await supabase.auth.getSession()
+
+      if (!data.session) {
+        router.replace('/login')
+      }
+    }
+
+    check()
+  }, [router])
 
   useEffect(() => {
     async function load() {

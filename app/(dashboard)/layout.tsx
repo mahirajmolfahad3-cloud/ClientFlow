@@ -32,12 +32,12 @@ function Sidebar({ user, onClose, mobile }: { user: User | null; mobile?: boolea
     <div className="flex flex-col h-full bg-gray-900">
       {/* Logo */}
       <div className="flex items-center justify-between px-6 py-5 border-b border-gray-800">
-        <div className="flex items-center gap-2.5">
+        <Link href="/dashboard" className="flex items-center gap-2 relative z-10 group">
           <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0">
             <span className="text-white font-bold text-sm">CF</span>
           </div>
           <span className="text-white font-bold text-lg">ClientFlow</span>
-        </div>
+        </Link>
         {mobile && (
           <button onClick={onClose} className="text-gray-400 hover:text-white p-1">
             <X className="w-5 h-5" />

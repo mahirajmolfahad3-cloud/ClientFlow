@@ -8,6 +8,8 @@ import {
   Shield, Zap, ArrowRight, Check, Star, Menu, X,
   ChevronRight, Globe, Clock, TrendingUp,
 } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
+import { useRouter } from 'next/navigation'
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const C = {
@@ -211,6 +213,20 @@ export default function LandingPage() {
   const [isAnnual, setIsAnnual]   = useState(false)
   const [mobileNav, setMobileNav] = useState(false)
   const [scrolled, setScrolled]   = useState(false)
+
+  const router = useRouter()
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data } = await supabase.auth.getSession()
+
+      if (data.session) {
+        router.replace('/dashboard')
+      }
+    }
+
+    checkAuth()
+  }, [router])
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 12)
