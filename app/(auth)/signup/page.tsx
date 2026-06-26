@@ -45,6 +45,29 @@ export default function SignupPage() {
     }
   }
 
+
+
+  async function handleDemoLogin() {
+    setError('')
+    setLoading(true)
+
+    const { error: signInError } =
+      await supabase.auth.signInWithPassword({
+        email: 'demo@clientflow.com',
+        password: '2939189mahirajmol',
+      })
+
+    if (signInError) {
+      setError(signInError.message)
+      setLoading(false)
+      return
+    }
+
+    window.location.href = '/dashboard'
+  }
+
+
+
   return (
     <div className="min-h-screen flex bg-gradient-to-br from-slate-50 via-indigo-50 to-white">
 
@@ -186,6 +209,36 @@ export default function SignupPage() {
                 )}
                 {loading ? 'Creating account…' : 'Create free account'}
               </button>
+
+              <button
+                type="button"
+                onClick={handleDemoLogin}
+                disabled={loading}
+                className="
+                  group relative w-full overflow-hidden
+                  rounded-2xl border border-indigo-200
+                  bg-white/70 backdrop-blur-sm
+                  py-3.5 px-4
+                  text-sm font-semibold text-indigo-700
+                  shadow-sm
+                  transition-all duration-300 ease-out
+
+                  hover:border-indigo-300
+                  hover:bg-indigo-50/80
+                  hover:shadow-lg hover:shadow-indigo-100
+                  hover:-translate-y-0.5
+
+                  active:scale-[0.98]
+
+                  disabled:cursor-not-allowed
+                  disabled:opacity-60
+
+                  flex items-center justify-center gap-2
+                "
+              >
+                Try Demo Mode
+              </button>
+
             </form>
 
             {/* footer */}

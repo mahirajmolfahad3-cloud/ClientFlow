@@ -30,6 +30,25 @@ export default function LoginPage() {
     }
   }
 
+  async function handleDemoLogin() {
+    setError('')
+    setLoading(true)
+
+    const { error: signInError } =
+      await supabase.auth.signInWithPassword({
+        email: 'demo@clientflow.com',
+        password: '2939189mahirajmol',
+      })
+
+    if (signInError) {
+      setError(signInError.message)
+      setLoading(false)
+      return
+    }
+
+    window.location.href = '/dashboard'
+  }
+
   return (
     <div className="min-h-screen flex bg-gradient-to-br from-slate-50 via-indigo-50 to-white">
 
@@ -162,6 +181,17 @@ export default function LoginPage() {
                 )}
                 {loading ? 'Signing in…' : 'Sign in'}
               </button>
+
+              <button
+                type="button"
+                onClick={handleDemoLogin}
+                disabled={loading}
+                className="w-full border-2 border-indigo-100 text-indigo-600 rounded-2xl py-3
+                          text-sm font-semibold hover:bg-indigo-50
+                          transition-all duration-200 flex items-center justify-center gap-2"
+              >
+                Try Demo Account
+              </button>              
             </form>
 
             {/* footer */}
