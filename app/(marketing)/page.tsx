@@ -11,6 +11,7 @@ import {
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 
+
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const C = {
   indigo:      '#6366f1',
@@ -213,6 +214,7 @@ export default function LandingPage() {
   const [isAnnual, setIsAnnual]   = useState(false)
   const [mobileNav, setMobileNav] = useState(false)
   const [scrolled, setScrolled]   = useState(false)
+  const [demoLoading, setDemoLoading] = useState(false)
 
   const router = useRouter()
 
@@ -233,6 +235,26 @@ export default function LandingPage() {
     window.addEventListener('scroll', handler)
     return () => window.removeEventListener('scroll', handler)
   }, [])
+
+
+  async function handleDemoLogin() {
+    setDemoLoading(true)
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email: 'demo@clientflow.com',
+      password: '2939189mahirajmol',
+    })
+
+    if (error) {
+      console.error(error)
+      setDemoLoading(false)
+      return
+    }
+
+    window.location.href = '/dashboard'
+  }
+
+  
 
   return (
     <>
@@ -374,9 +396,27 @@ export default function LandingPage() {
               <Link href="/signup" className="btn-primary" style={{ padding: '14px 28px', fontSize: 15 }}>
                 Start for free <ArrowRight size={16} />
               </Link>
-              <Link href="/login" className="btn-ghost" style={{ padding: '14px 28px', fontSize: 15 }}>
-                Sign in to your account
-              </Link>
+
+              <button
+                onClick={handleDemoLogin}
+                disabled={demoLoading}
+                className="
+                  group
+                  rounded-2xl
+                  border border-indigo-200
+                  bg-white/80 backdrop-blur
+                  px-6 py-3.5
+                  text-sm font-semibold text-indigo-700
+                  shadow-sm
+                  transition-all duration-300
+                  hover:-translate-y-1
+                  hover:bg-indigo-50
+                  hover:shadow-lg hover:shadow-indigo-100
+                "
+              >
+                {demoLoading ? 'Opening demo...' : 'Try Demo Mode'}
+              </button> 
+
             </div>
 
             <p style={{

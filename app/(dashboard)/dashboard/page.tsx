@@ -70,7 +70,7 @@ export default function DashboardPage() {
     <div className="p-6 lg:p-8 space-y-8 max-w-7xl mx-auto">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-extrabold text-gray-900">Hey, {userName} 👋</h1>
+        <h1 className="text-2xl font-extrabold text-gray-900">Hey, {userName} 👋 </h1>
         <p className="text-gray-500 mt-1">Here&apos;s what&apos;s happening with your business today.</p>
       </div>
 
