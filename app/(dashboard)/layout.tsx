@@ -11,13 +11,38 @@ import {
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/clients', label: 'Clients', icon: Users },
-  { href: '/projects', label: 'Projects', icon: FolderOpen },
-  { href: '/tasks', label: 'Tasks', icon: CheckSquare },
-  { href: '/settings', label: 'Settings', icon: Settings },
+  { href: '/clients',   label: 'Clients',   icon: Users },
+  { href: '/projects',  label: 'Projects',  icon: FolderOpen },
+  { href: '/tasks',     label: 'Tasks',     icon: CheckSquare },
+  { href: '/settings',  label: 'Settings',  icon: Settings },
 ]
 
-function Sidebar({ user, onClose, mobile }: { user: User | null; mobile?: boolean; onClose?: () => void }) {
+// ─── Sage + Slate tokens (mirrors landing page) ───────────────────────────────
+const sage      = '#7c9e8f'
+const sageLight = '#eef4f1'
+const sageMid   = '#c2d9d0'
+const sageDeep  = '#3d5c50'
+const slate950  = '#0c1117'
+const slate900  = '#111827'
+const slate800  = '#1f2937'
+const slate700  = '#374151'
+const slate600  = '#4b5563'
+const slate500  = '#6b7280'
+const slate400  = '#9ca3af'
+const slate300  = '#d1d5db'
+const slate200  = '#e5e7eb'
+const slate100  = '#f3f4f6'
+const slate50   = '#f9fafb'
+
+function Sidebar({
+  user,
+  onClose,
+  mobile,
+}: {
+  user: User | null
+  mobile?: boolean
+  onClose?: () => void
+}) {
   const pathname = usePathname()
 
   async function handleSignOut() {
@@ -25,55 +50,146 @@ function Sidebar({ user, onClose, mobile }: { user: User | null; mobile?: boolea
     window.location.href = '/'
   }
 
-  const name = user?.user_metadata?.full_name ?? user?.email?.split('@')[0] ?? 'User'
+  const name     = user?.user_metadata?.full_name ?? user?.email?.split('@')[0] ?? 'User'
   const initials = name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
 
   return (
-    <div className="flex flex-col h-full bg-gray-900">
+    <div style={{
+      display: 'flex', flexDirection: 'column', height: '100%',
+      background: slate950,
+    }}>
       {/* Logo */}
-      <div className="flex items-center justify-between px-6 py-5 border-b border-gray-800">
-        <Link href="/dashboard" className="flex items-center gap-2 relative z-10 group">
-          <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0">
-            <span className="text-white font-bold text-sm">CF</span>
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '18px 20px',
+        borderBottom: `1px solid rgba(255,255,255,.07)`,
+      }}>
+        <Link href="/dashboard" style={{
+          display: 'flex', alignItems: 'center', gap: 9, textDecoration: 'none',
+        }}>
+          <div style={{
+            width: 30, height: 30, background: sage, borderRadius: 8,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+          }}>
+            <span style={{ color: '#fff', fontWeight: 800, fontSize: 11 }}>CF</span>
           </div>
-          <span className="text-white font-bold text-lg">ClientFlow</span>
+          <span style={{ color: '#fff', fontWeight: 800, fontSize: 15, letterSpacing: '-.02em' }}>
+            ClientFlow
+          </span>
         </Link>
+
         {mobile && (
-          <button onClick={onClose} className="text-gray-400 hover:text-white p-1">
-            <X className="w-5 h-5" />
+          <button
+            onClick={onClose}
+            style={{
+              background: 'none', border: 'none', cursor: 'pointer',
+              color: slate400, padding: 4, display: 'flex',
+            }}
+          >
+            <X size={18} />
           </button>
         )}
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+      <nav style={{
+        flex: 1, padding: '12px 10px',
+        display: 'flex', flexDirection: 'column', gap: 2,
+        overflowY: 'auto',
+      }}>
         {navItems.map(({ href, label, icon: Icon }) => {
           const active = pathname === href || (href !== '/dashboard' && pathname.startsWith(href))
           return (
-            <Link key={href} href={href} onClick={onClose}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all group ${
-                active ? 'bg-indigo-600 text-white' : 'text-gray-400 hover:text-white hover:bg-gray-800'
-              }`}>
-              <Icon className="w-5 h-5 flex-shrink-0" />
-              <span className="flex-1">{label}</span>
-              {active && <ChevronRight className="w-4 h-4 opacity-60" />}
+            <Link
+              key={href}
+              href={href}
+              onClick={onClose}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 10,
+                padding: '9px 12px', borderRadius: 8,
+                fontSize: 13, fontWeight: 500, textDecoration: 'none',
+                transition: 'all .15s',
+                background: active ? sage : 'transparent',
+                color: active ? '#fff' : slate400,
+              }}
+              onMouseEnter={e => {
+                if (!active) {
+                  (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,.06)'
+                  ;(e.currentTarget as HTMLAnchorElement).style.color = '#fff'
+                }
+              }}
+              onMouseLeave={e => {
+                if (!active) {
+                  (e.currentTarget as HTMLAnchorElement).style.background = 'transparent'
+                  ;(e.currentTarget as HTMLAnchorElement).style.color = slate400
+                }
+              }}
+            >
+              <Icon size={16} style={{ flexShrink: 0 }} />
+              <span style={{ flex: 1 }}>{label}</span>
+              {active && <ChevronRight size={13} style={{ opacity: 0.6 }} />}
             </Link>
           )
         })}
       </nav>
 
       {/* User section */}
-      <div className="px-3 py-4 border-t border-gray-800 space-y-1">
-        <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg">
-          <div className="w-8 h-8 rounded-full bg-indigo-500/30 text-indigo-300 flex items-center justify-center text-xs font-bold flex-shrink-0">{initials}</div>
-          <div className="flex-1 min-w-0">
-            <p className="text-white text-sm font-medium truncate">{name}</p>
-            <p className="text-gray-500 text-xs truncate">{user?.email}</p>
+      <div style={{
+        padding: '10px 10px 14px',
+        borderTop: `1px solid rgba(255,255,255,.07)`,
+        display: 'flex', flexDirection: 'column', gap: 2,
+      }}>
+        {/* User info */}
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 10,
+          padding: '9px 12px', borderRadius: 8,
+        }}>
+          <div style={{
+            width: 32, height: 32, borderRadius: '50%',
+            background: `${sage}33`,
+            color: sage,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 11, fontWeight: 700, flexShrink: 0,
+          }}>
+            {initials}
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <p style={{
+              color: '#fff', fontSize: 13, fontWeight: 600,
+              margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            }}>
+              {name}
+            </p>
+            <p style={{
+              color: slate500, fontSize: 11, margin: 0,
+              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            }}>
+              {user?.email}
+            </p>
           </div>
         </div>
-        <button onClick={handleSignOut}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 transition-all w-full">
-          <LogOut className="w-5 h-5" />
+
+        {/* Sign out */}
+        <button
+          onClick={handleSignOut}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 10,
+            padding: '9px 12px', borderRadius: 8,
+            fontSize: 13, fontWeight: 500,
+            color: slate400, background: 'none', border: 'none',
+            cursor: 'pointer', width: '100%', textAlign: 'left',
+            transition: 'all .15s',
+          }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,.06)'
+            ;(e.currentTarget as HTMLButtonElement).style.color = '#fff'
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLButtonElement).style.background = 'none'
+            ;(e.currentTarget as HTMLButtonElement).style.color = slate400
+          }}
+        >
+          <LogOut size={16} style={{ flexShrink: 0 }} />
           Sign out
         </button>
       </div>
@@ -82,8 +198,8 @@ function Sidebar({ user, onClose, mobile }: { user: User | null; mobile?: boolea
 }
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [user, setUser]           = useState<User | null>(null)
+  const [loading, setLoading]     = useState(true)
   const [mobileOpen, setMobileOpen] = useState(false)
 
   useEffect(() => {
@@ -96,47 +212,111 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-sm text-gray-500">Loading ClientFlow…</p>
+      <div style={{
+        minHeight: '100vh', display: 'flex',
+        alignItems: 'center', justifyContent: 'center',
+        background: slate50,
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{
+            width: 28, height: 28,
+            border: `2px solid ${sage}`,
+            borderTopColor: 'transparent',
+            borderRadius: '50%',
+            animation: 'spin .75s linear infinite',
+            margin: '0 auto 12px',
+          }} />
+          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+          <p style={{ fontSize: 13, color: slate500 }}>Loading ClientFlow…</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
+    <div style={{
+      display: 'flex', height: '100vh',
+      background: slate100, overflow: 'hidden',
+    }}>
       {/* Desktop sidebar */}
-      <div className="hidden lg:flex lg:flex-col lg:w-64 lg:flex-shrink-0">
+      <div style={{
+        width: 224, flexShrink: 0,
+        display: 'none',
+      }}
+        className="cf-sidebar-desktop"
+      >
         <Sidebar user={user} />
       </div>
+
+      <style>{`
+        @media (min-width: 1024px) {
+          .cf-sidebar-desktop { display: flex !important; flex-direction: column; }
+          .cf-mobile-topbar { display: none !important; }
+        }
+        @media (max-width: 1023px) {
+          .cf-sidebar-desktop { display: none !important; }
+          .cf-mobile-topbar { display: flex !important; }
+        }
+      `}</style>
 
       {/* Mobile sidebar overlay */}
       {mobileOpen && (
         <>
-          <div className="fixed inset-0 z-40 bg-black/60 lg:hidden" onClick={() => setMobileOpen(false)} />
-          <div className="fixed inset-y-0 left-0 z-50 w-64 lg:hidden">
+          <div
+            onClick={() => setMobileOpen(false)}
+            style={{
+              position: 'fixed', inset: 0, zIndex: 40,
+              background: 'rgba(0,0,0,.55)',
+            }}
+          />
+          <div style={{
+            position: 'fixed', top: 0, left: 0, bottom: 0,
+            width: 224, zIndex: 50,
+          }}>
             <Sidebar user={user} mobile onClose={() => setMobileOpen(false)} />
           </div>
         </>
       )}
 
       {/* Main area */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <div style={{
+        flex: 1, display: 'flex', flexDirection: 'column',
+        minWidth: 0, overflow: 'hidden',
+      }}>
         {/* Mobile topbar */}
-        <div className="lg:hidden flex items-center gap-4 px-4 py-3 bg-white border-b border-gray-200">
-          <button onClick={() => setMobileOpen(true)} className="text-gray-500 hover:text-gray-700 p-1">
-            <Menu className="w-6 h-6" />
+        <div
+          className="cf-mobile-topbar"
+          style={{
+            alignItems: 'center', gap: 14,
+            padding: '10px 16px',
+            background: '#fff',
+            borderBottom: `1px solid ${slate200}`,
+          }}
+        >
+          <button
+            onClick={() => setMobileOpen(true)}
+            style={{
+              background: 'none', border: 'none', cursor: 'pointer',
+              color: slate600, padding: 4, display: 'flex',
+            }}
+          >
+            <Menu size={22} />
           </button>
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-indigo-600 rounded-md flex items-center justify-center"><span className="text-white font-bold text-xs">CF</span></div>
-            <span className="font-bold text-gray-900">ClientFlow</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{
+              width: 24, height: 24, background: sage, borderRadius: 6,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <span style={{ color: '#fff', fontWeight: 800, fontSize: 10 }}>CF</span>
+            </div>
+            <span style={{ fontWeight: 800, fontSize: 15, color: slate900, letterSpacing: '-.02em' }}>
+              ClientFlow
+            </span>
           </div>
         </div>
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto">
+        <main style={{ flex: 1, overflowY: 'auto' }}>
           {children}
         </main>
       </div>
