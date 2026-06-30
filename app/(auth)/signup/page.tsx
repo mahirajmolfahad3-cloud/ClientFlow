@@ -131,6 +131,7 @@ export default function SignupPage() {
   const [error,    setError]    = useState('')
   const [loading,  setLoading]  = useState(false)
 
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError('')
@@ -143,39 +144,39 @@ export default function SignupPage() {
     })
 
     if (signUpError) {
-      setError(signUpError.message)
+      setError(signUpError.message || 'Could not create account.')
       setLoading(false)
       return
     }
 
-    if (data.user) {
-      const { error: siteError } = await supabase
-        .from("user_sites")
-        .insert({
-          id: data.user.id,
-          site: "B",
-        })
-
-      if (siteError) {
-        setError(siteError.message)
-        setLoading(false)
-        return
-      }
-    }
-
-    const { error: signInError } =
+    // Sign in FIRST so we have an authenticated session before any RLS-protected inserts
+    const { data: signInData, error: signInError } =
       await supabase.auth.signInWithPassword({ email, password })
 
     if (signInError) {
+      // Most likely: email confirmation is required, so there's no session yet
       setError('Account created! Please confirm your email, then sign in.')
       setLoading(false)
       return
     }
 
-    const { data: sessionData } = await supabase.auth.getSession()
-    window.location.href = sessionData.session ? '/dashboard' : '/login'
-  }
+    if (signInData.user) {
+      const { error: siteError } = await supabase
+        .from('user_sites')
+        .insert({
+          id: signInData.user.id,
+          site: 'B',
+        })
 
+      if (siteError) {
+        setError(siteError.message || 'Could not finish setting up your account.')
+        setLoading(false)
+        return
+      }
+    }
+
+    window.location.href = '/dashboard'
+  }
   
   async function handleDemoLogin() {
     setError('')
