@@ -132,7 +132,7 @@ export default function LoginPage() {
     setError('')
     setLoading(true)
 
-    const { error: signInError } =
+    const { data, error: signInError } =
       await supabase.auth.signInWithPassword({ email, password })
 
     if (signInError) {
@@ -141,8 +141,26 @@ export default function LoginPage() {
       return
     }
 
-    const { data } = await supabase.auth.getSession()
-    if (data.session) window.location.href = '/dashboard'
+    if (data.user) {
+      const { data: siteData, error: siteError } = await supabase
+        .from("user_sites")
+        .select("site")
+        .eq("id", data.user.id)
+        .single()
+
+      if (siteError || siteData.site !== "B") {
+        await supabase.auth.signOut()
+        setError("This account does not belong to this website.")
+        setLoading(false)
+        return
+      }
+    }
+
+    const { data: sessionData } = await supabase.auth.getSession()
+
+    if (sessionData.session) {
+      window.location.href = '/dashboard'
+    }
   }
 
   async function handleDemoLogin() {

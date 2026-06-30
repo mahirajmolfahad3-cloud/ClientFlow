@@ -136,7 +136,7 @@ export default function SignupPage() {
     setError('')
     setLoading(true)
 
-    const { error: signUpError } = await supabase.auth.signUp({
+    const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
       options: { data: { full_name: name } },
@@ -148,6 +148,21 @@ export default function SignupPage() {
       return
     }
 
+    if (data.user) {
+      const { error: siteError } = await supabase
+        .from("user_sites")
+        .insert({
+          id: data.user.id,
+          site: "B",
+        })
+
+      if (siteError) {
+        setError(siteError.message)
+        setLoading(false)
+        return
+      }
+    }
+
     const { error: signInError } =
       await supabase.auth.signInWithPassword({ email, password })
 
@@ -157,10 +172,11 @@ export default function SignupPage() {
       return
     }
 
-    const { data } = await supabase.auth.getSession()
-    window.location.href = data.session ? '/dashboard' : '/login'
+    const { data: sessionData } = await supabase.auth.getSession()
+    window.location.href = sessionData.session ? '/dashboard' : '/login'
   }
 
+  
   async function handleDemoLogin() {
     setError('')
     setLoading(true)
