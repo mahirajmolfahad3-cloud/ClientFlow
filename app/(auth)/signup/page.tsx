@@ -131,35 +131,54 @@ export default function SignupPage() {
   const [error,    setError]    = useState('')
   const [loading,  setLoading]  = useState(false)
 
+  
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError('')
     setLoading(true)
 
-    const { error: signUpError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { full_name: name } },
-    })
+    try {
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: name,
+          },
+        },
+      })
 
-    if (signUpError) {
-      setError(signUpError.message)
+      console.log("SIGNUP DATA:", data)
+      console.log("SIGNUP ERROR:", signUpError)
+
+      if (signUpError) {
+        setError(signUpError.message)
+        return
+      }
+
+      if (!data.user) {
+        setError("Signup failed. No user was created.")
+        return
+      }
+
+      // Email confirmation enabled
+      if (!data.session) {
+        setError("Account created. Please confirm your email before signing in.")
+        return
+      }
+
+      window.location.href = "/dashboard"
+
+    } catch (err: any) {
+      console.error("Unexpected error:", err)
+      setError(err?.message || "Something went wrong")
+    } finally {
       setLoading(false)
-      return
     }
-
-    const { error: signInError } =
-      await supabase.auth.signInWithPassword({ email, password })
-
-    if (signInError) {
-      setError('Account created! Please confirm your email, then sign in.')
-      setLoading(false)
-      return
-    }
-
-    const { data } = await supabase.auth.getSession()
-    window.location.href = data.session ? '/dashboard' : '/login'
   }
+
+
 
   async function handleDemoLogin() {
     setError('')
